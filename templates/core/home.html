@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="p-5 mb-4 bg-light rounded-3 text-center">
+      <h1 class="display-4">Witaj w naszej firmie kurierskiej!</h1>
+      <p class="lead">Najszybsze i najpewniejsze przesyłki w całej okolicy.</p>
+      {% if user.is_authenticated %}
+        <p class="text-success">
+          Jesteś zalogowany jako: <strong>{{ user.username }}</strong>
+        </p>
+        <a href="{% url 'orders:order_list' %}" class="btn btn-primary btn-lg">Przejdź do moich zamówień</a>
+      {% else %}
+        <a href="{% url 'users:login' %}" class="btn btn-success btn-lg">Zaloguj się</a>
+        <a href="{% url 'users:register' %}" class="btn btn-outline-primary btn-lg">Zarejestruj się</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <h3>Szybkie przesyłki</h3>
+    <p>
+      Dostarczamy przesyłki ekspresowo do dowolnego miejsca w kraju
+      i za granicą, gwarantując terminowość i bezpieczeństwo.
+    </p>
+  </div>
+  <div class="col-md-4">
+    <h3>Śledzenie w czasie rzeczywistym</h3>
+    <p>
+      Oferujemy zaawansowany system śledzenia przesyłek w czasie
+      rzeczywistym. Zawsze wiesz, gdzie jest Twoja paczka!
+    </p>
+  </div>
+  <div class="col-md-4">
+    <h3>Obsługa klienta 24/7</h3>
+    <p>
+      Nasz dział wsparcia czuwa przez całą dobę. W razie pytań
+      lub problemów, zawsze możesz zgłosić zgłoszenie w naszym systemie.
+    </p>
+  </div>
+</div>
+{% endblock %}

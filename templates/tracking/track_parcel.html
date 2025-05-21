@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Śledzenie przesyłki</h2>
+    {% if order %}
+        <p>Numer przesyłki: {{ order.tracking_number }}</p>
+        <p>Status: {{ order.get_status_display }}</p>
+        <p>Aktualne lat/long: {{ parcel.current_lat }} / {{ parcel.current_lng }}</p>
+
+        <div id="map" style="height: 500px; width: 100%;"></div>
+        <script>
+            function initMap() {
+                const rawLat = "{{ parcel.current_lat|default:'50.0646501' }}";
+                const rawLng = "{{ parcel.current_lng|default:'19.9449799' }}";
+                console.log("DEBUG rawLat =", rawLat);
+                console.log("DEBUG rawLng =", rawLng);
+            
+                const lat = parseFloat(rawLat);
+                const lng = parseFloat(rawLng);
+                console.log("JS >> lat:", lat, "lng:", lng);
+                const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: { lat: lat, lng: lng }
+              });
+          
+              new google.maps.Marker({
+                position: { lat: lat, lng: lng },
+                map: map,
+                title: 'Aktualna lokalizacja paczki'
+              });
+            }
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=2137&callback=initMap" async defer></script>
+    {% else %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="tracking_number">Numer przesyłki</label>
+                <input type="text" id="tracking_number" name="tracking_number" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Śledź</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

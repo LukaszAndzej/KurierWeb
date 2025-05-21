@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: courier-app-deployment
+  labels:
+    app: courier-suite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: courier-suite
+  template:
+    metadata:
+      labels:
+        app: courier-suite
+    spec:
+      volumes:
+      - name: courier-db-storage
+        persistentVolumeClaim:
+          claimName: courier-db-pvc
+      containers:
+      - name: courier-web-app
+        image: localhost/courier-app:v1
+        imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 8000
+        command:
+          - "/bin/sh"
+          - "-c"
+          - "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 CourierProject.asgi:application"
+        volumeMounts:
+        - name: courier-db-storage
+          mountPath: /app/persistent_data
+        workingDir: /app
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 45
+          periodSeconds: 20
+          failureThreshold: 3
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 75
+          periodSeconds: 30
+          failureThreshold: 3
+          timeoutSeconds: 10
+
+      - name: courier-status-updater
+        image: localhost/courier-app:v1
+        imagePullPolicy: IfNotPresent
+        workingDir: /app
+        command: ["python", "manage.py", "update_status"]
+        volumeMounts:
+        - name: courier-db-storage
+          mountPath: /app/persistent_data

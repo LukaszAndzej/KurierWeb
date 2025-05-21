@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: courier-web-service
+spec:
+  type: ClusterIP
+  selector:
+    app: courier-suite
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+---

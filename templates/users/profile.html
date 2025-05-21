@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Panel użytkownika</h2>
+  <div class="row">
+    <!-- Menu po lewej stronie -->
+    <div class="col-md-3">
+      <div class="list-group">
+        <a href="{% url 'users:profile' %}" class="list-group-item list-group-item-action active">
+          Profil
+        </a>
+        <a href="{% url 'orders:order_list' %}" class="list-group-item list-group-item-action">
+          Moje zamówienia
+        </a>
+        <a href="{% url 'orders:create_order' %}" class="list-group-item list-group-item-action">
+          Złóż nowe zamówienie
+        </a>
+        <a href="{% url 'tracking:track_parcel' %}" class="list-group-item list-group-item-action">
+          Śledź przesyłkę
+        </a>
+        <a href="{% url 'support:create_ticket' %}" class="list-group-item list-group-item-action">Zgłoś problem</a>
+        <a href="{% url 'support:my_ticket_list' %}" class="list-group-item list-group-item-action">Moje zgłoszenia</a>
+      </div>
+    </div>
+    <!-- Zawartość strony -->
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Witaj, {{ user.username }}</h4>
+          <p class="card-text">Email: {{ user.email }}</p>
+          <p class="card-text">
+            Typ konta: {{ user.is_business|yesno:"Biznesowe,Indywidualne" }}
+          </p>
+          <hr>
+          <h5>Statystyki</h5>
+          <ul>
+            <li>Liczba zamówień: {{ stats.total_orders }}</li>
+            <li>Oczekujące przesyłki: {{ stats.pending_orders }}</li>
+            <li>Zrealizowane przesyłki: {{ stats.delivered_orders }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center">Złóż nowe zamówienie</h2>
+  <form method="post">
+    {% csrf_token %}
+    <h4>Informacje o paczce</h4>
+    {{ parcel_form.as_p }}
+    <h4>Status zamówienia</h4>
+    {{ order_form.as_p }}
+    <button type="submit" class="btn btn-primary w-100">Wyślij zamówienie</button>
+  </form>
+</div>
+{% endblock %}

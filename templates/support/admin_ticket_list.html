@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center">Panel administratora - wszystkie zgłoszenia</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Użytkownik</th>
+        <th>Temat</th>
+        <th>Opis</th>
+        <th>Data zgłoszenia</th>
+        <th>Status</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ticket in tickets %}
+        <tr>
+          <td>{{ ticket.id }}</td>
+          <td>{{ ticket.user.username }}</td>
+          <td>{{ ticket.subject }}</td>
+          <td>{{ ticket.description }}</td>
+          <td>{{ ticket.created_at }}</td>
+          <td>
+            {% if ticket.is_resolved %}
+              <span class="badge bg-success">Rozwiązane</span>
+            {% else %}
+              <span class="badge bg-warning">Oczekujące</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not ticket.is_resolved %}
+              <a href="{% url 'support:admin_resolve_ticket' ticket.id %}" class="btn btn-sm btn-primary">
+                Oznacz jako rozwiązane
+              </a>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7" class="text-center">Brak zgłoszeń</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

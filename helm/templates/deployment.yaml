@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm.fullname" . }}
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "helm.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "helm.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: {{ include "helm.fullname" . }}-db-pvc
+      containers:
+        - name: {{ .Chart.Name }}-web-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 CourierProject.asgi:application"
+          volumeMounts:
+            - name: db-storage
+              mountPath: {{ .Values.persistence.mountPath | quote }}
+          workingDir: /app
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 75
+            periodSeconds: 30
+        - name: {{ .Chart.Name }}-status-updater
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          workingDir: /app
+          command: ["python", "manage.py", "update_status"]
+          volumeMounts:
+            - name: db-storage
+              mountPath: {{ .Values.persistence.mountPath | quote }}
+---
